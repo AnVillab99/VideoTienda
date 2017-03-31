@@ -12,6 +12,8 @@ import edu.eci.pdsw.samples.entities.TipoItem;
 import edu.eci.pdsw.samples.services.ExcepcionServiciosAlquiler;
 import edu.eci.pdsw.samples.services.ServiciosAlquiler;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -20,16 +22,21 @@ import java.util.List;
  */
 @Singleton
 public class ServiciosAlquilerItemsImpl implements ServiciosAlquiler {
-
+    
+    private static final int MULTA_DIARIA=5000;
+    
     @Inject
     private ItemDAO daoItem;
     
     @Inject
     private ClienteDAO daoCliente;
+    
+    @Inject 
+    private TipoItemDAO daoTipoItem;
         
     @Override
     public int valorMultaRetrasoxDia() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return MULTA_DIARIA; 
     }
 
     @Override
@@ -43,12 +50,20 @@ public class ServiciosAlquilerItemsImpl implements ServiciosAlquiler {
 
     @Override
     public List<ItemRentado> consultarItemsCliente(long idcliente) throws ExcepcionServiciosAlquiler {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+         try {
+            return daoCliente.load(idcliente).getRentados();
+        } catch (PersistenceException ex) {
+            throw new ExcepcionServiciosAlquiler("Error al consultar el Cliente "+idcliente,ex);
+        }
     }
 
     @Override
     public List<Cliente> consultarClientes() throws ExcepcionServiciosAlquiler {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+         try {
+            return daoCliente.load();
+        } catch (PersistenceException ex) {
+            throw new ExcepcionServiciosAlquiler("Error al consultar el Cliente ",ex);
+        }
     }
 
     @Override
@@ -62,27 +77,50 @@ public class ServiciosAlquilerItemsImpl implements ServiciosAlquiler {
 
     @Override
     public List<Item> consultarItemsDisponibles() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            return daoItem.itemsDisponibles();
     }
 
     @Override
     public long consultarMultaAlquiler(int iditem, Date fechaDevolucion) throws ExcepcionServiciosAlquiler {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       try {
+            
+            ItemRentado  iRent= daoCliente.loadItemRentado(iditem);
+            LocalDate fechaMinimaEntrega=iRent.getFechafinrenta().toLocalDate();
+            
+            LocalDate fechaEntrega=fechaDevolucion.toLocalDate();
+            long diasRetraso = ChronoUnit.DAYS.between(fechaMinimaEntrega, fechaEntrega);
+            if (diasRetraso<0) diasRetraso =0;
+            return diasRetraso*MULTA_DIARIA;
+        } catch (PersistenceException ex) {
+            throw new ExcepcionServiciosAlquiler("Error al consultar la multa de alquiler "+iditem,ex);
+}
     }
 
     @Override
     public TipoItem consultarTipoItem(int id) throws ExcepcionServiciosAlquiler {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try{
+            return daoTipoItem.load(id);
+        }catch(Exception e){
+            throw new ExcepcionServiciosAlquiler("Error al consultar la multa de alquiler "+id,e);
+        }
     }
 
     @Override
     public List<TipoItem> consultarTiposItem() throws ExcepcionServiciosAlquiler {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try{
+            return daoTipoItem.load();
+        }catch(Exception e){
+            throw new ExcepcionServiciosAlquiler("Error al consultar la multa de alquiler ",e);
+        }
     }
 
     @Override
     public void registrarAlquilerCliente(Date date, long docu, Item item, int numdias) throws ExcepcionServiciosAlquiler {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       try{
+            daoCliente.saveAlquier(date, docu, item, numdias);
+        } catch (PersistenceException ex) {
+                throw new ExcepcionServiciosAlquiler("Error al registrar el alquiler"+date.toString(),ex);
+}
     }
 
     @Override

@@ -69,8 +69,33 @@
     where c.documento=#{idcli}
     </select>
     
+    <select parameterType="map" id="consultarItemRentado" resultMap="ItemRentadoResult"> 
+            select
+    
+    ir.id as id,
+    ir.fechainiciorenta as fechainiciorenta,
+    ir.fechafinrenta as fechafinrenta,
+    
+    i.id as i_id ,
+    i.nombre as i_nombre ,
+    i.descripcion  as i_descripcion,
+    i.fechalanzamiento as i_fechalanzamiento ,
+    i.tarifaxdia as  i_tarifaxdia,
+    i.formatorenta as i_formatorenta,
+    i.genero as i_genero,
+                
+    ti.id as i_ti_id,
+    ti.descripcion as i_ti_descripcion    
+
+    
+    FROM VI_ITEMRENTADO as ir 
+    left join VI_ITEMS as i on ir.ITEMS_id=i.id 
+    left join VI_TIPOITEM as ti on i.TIPOITEM_id=ti.id 
+    where ir.id=#{iditem}
+    </select>
+    
     <insert parameterType="map" id="agregarItemRentadoACliente">
-    insert into VI_ITEMRENTADO values(87,#{idir},#{idirt},#{fechainiir},#{fechafinir}) 
+    insert into VI_ITEMRENTADO values(select max(id)+1 from VI_ITEMRENTADO,#{idir},#{idirt},#{fechainiir},#{fechafinir}) 
     </insert>
     
     <insert parameterType="map" id="insertarCliente">

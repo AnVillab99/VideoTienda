@@ -5,9 +5,7 @@
   
 <mapper namespace="edu.eci.pdsw.sampleprj.dao.mybatis.mappers.ItemMapper">
 
- <insert parameterType="map" id="insertarItem" >
-        insert into VI_ITEMS values(#{item.id},#{item.nombre},#{item.descripcion},#{item.fechaLanzamiento},#{item.tarifaxDia},#{item.formatoRenta},#{item.genero},#{item.tipo.id})
-    </insert>
+   
     <select parameterType="map" id="getItems" resultMap="ItemResult">
         select
         i.id ,
@@ -41,8 +39,29 @@
         left join VI_TIPOITEM as ti on i.TIPOITEM_id=ti.id    
         where i.id=#{idi}
     </select>
+    <select  parameterType="map" id="consultarItemsDisp" resultMap="ItemResult">
+       select
+        i.id ,
+        i.nombre,
+        i.descripcion,
+        i.fechalanzamiento,
+        i.tarifaxdia,
+        i.formatorenta,
+        i.genero,
+        
+        ti.id as ti_id,
+        ti.descripcion as ti_descripcion
+        
+        FROM VI_ITEMS as i
+        left join VI_TIPOITEM as ti on i.TIPOITEM_id=ti.id    
+        where i.id NOT IN (select  ITEMS_id  from VI_ITEMRENTADO)  
+    </select>
     
-       <resultMap type='Item' id='ItemResult'>
+    <insert parameterType="map" id="insertarItem" >
+        insert into VI_ITEMS values(#{item.id},#{item.nombre},#{item.descripcion},#{item.fechaLanzamiento},#{item.tarifaxDia},#{item.formatoRenta},#{item.genero},#{item.tipo.id})
+    </insert>
+    
+    <resultMap type='Item' id='ItemResult'>
         <id property="id" column='id'/>
         <result property="nombre" column="nombre" />
         <result property="descripcion" column="descripcion"/>
@@ -50,13 +69,9 @@
         <result property="tarifaxDia" column="tarifaxdia"/>
         <result property="formatoRenta" column="formatorenta"/>
         <result property="genero" column="genero"/>
-        <association property="tipo" javaType="TipoItem" columnPrefix='ti_' resultMap="TipoItemResult"/>
+        <association property="tipo" javaType="TipoItem" columnPrefix='ti_' resultMap="edu.eci.pdsw.sampleprj.dao.mybatis.mappers.TipoItemMapper.TipoItemResult"/>
     </resultMap> 
     
-    <resultMap type='TipoItem' id='TipoItemResult'>
-        <id property="id" column="id"/>
-        <result property="descripcion" column='descripcion'/>
-    </resultMap>
 
     
     

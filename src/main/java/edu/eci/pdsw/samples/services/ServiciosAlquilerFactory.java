@@ -37,6 +37,7 @@ public class ServiciosAlquilerFactory {
                         bind(ServiciosAlquiler.class).to(ServiciosAlquilerItemsImpl.class);
                         bind(ItemDAO.class).to(MyBATISItemDAO.class);
                         bind(ClienteDAO.class).to(MyBATISClienteDao.class);
+                        bind(TipoItemDAO.class).to(MyBATISTipoItemDAO.class);
                     }
 
                 }
@@ -52,6 +53,7 @@ public class ServiciosAlquilerFactory {
                         bind(ServiciosAlquiler.class).to(ServiciosAlquilerItemsImpl.class);
                         bind(ItemDAO.class).to(MyBATISItemDAO.class);
                         bind(ClienteDAO.class).to(MyBATISClienteDao.class);
+                        bind(TipoItemDAO.class).to(MyBATISTipoItemDAO.class);
                     }
 
                 }
